@@ -7,4 +7,5 @@ import java.util.UUID;
 public class CategoriaDTO {
     private UUID categoriaId;
     private String nombre;
+    private Boolean activo;
 }

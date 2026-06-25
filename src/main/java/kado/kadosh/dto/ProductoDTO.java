@@ -13,4 +13,5 @@ public class ProductoDTO {
     private UUID subCategoriaId;
     private String nombreCategoria; // Para mostrarlo en tablas
     private String nombreSubCategoria;
+    private Boolean activo;
 }

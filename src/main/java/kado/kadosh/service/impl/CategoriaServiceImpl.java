@@ -1,17 +1,20 @@
 package kado.kadosh.service.impl;
 
+import kado.kadosh.dto.CategoriaDTO;
 import kado.kadosh.entities.Categoria;
 import kado.kadosh.repository.CategoriaRepository;
 import kado.kadosh.service.CategoriaService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CategoriaServiceImpl implements CategoriaService {
 
-    @Autowired private CategoriaRepository categoriaRepo;
+    private final CategoriaRepository categoriaRepo;
 
     @Override
     public List<Categoria> listarActivas() {
@@ -19,13 +22,38 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    public Categoria buscarPorId(UUID id) {
-        return categoriaRepo.findById(id).orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+    public List<Categoria> listarTodas() {
+        return categoriaRepo.findAll();
     }
 
     @Override
-    public Categoria guardar(Categoria categoria) {
-        if (categoria.getCategoriaId() == null) categoria.setCategoriaId(UUID.randomUUID());
+    public Categoria buscarPorId(UUID id) {
+        return categoriaRepo.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+    }
+
+    @Override
+    public Categoria guardar(CategoriaDTO dto) {
+        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
+            throw new RuntimeException("El nombre de la categoría es obligatorio");
+        }
+        Categoria categoria = new Categoria();
+        categoria.setCategoriaId(UUID.randomUUID());
+        categoria.setNombre(dto.getNombre());
+        categoria.setActivo(true);
+        return categoriaRepo.save(categoria);
+    }
+
+    @Override
+    public Categoria actualizar(UUID id, CategoriaDTO dto) {
+        Categoria categoria = buscarPorId(id);
+        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
+            throw new RuntimeException("El nombre de la categoría es obligatorio");
+        }
+        categoria.setNombre(dto.getNombre());
+        if (dto.getActivo() != null) {
+            categoria.setActivo(dto.getActivo());
+        }
         return categoriaRepo.save(categoria);
     }
 
